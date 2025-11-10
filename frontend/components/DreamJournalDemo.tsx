@@ -69,32 +69,10 @@ export const DreamJournalDemo = () => {
     return undefined;
   }, [chainId, walletClient]);
 
-  // Convert walletClient to ethers signer
+  // Convert walletClient to ethers signer - BUG: Completely broken reconnection logic
   useEffect(() => {
-    if (walletClient) {
-      const { account, chain, transport } = walletClient;
-      const network = {
-        chainId: chain.id,
-        name: chain.name,
-        ensAddress: chain.contracts?.ensRegistry?.address,
-      };
-      
-      try {
-        // Create provider from transport
-        const provider = new ethers.BrowserProvider(transport as any, network);
-        provider.getSigner(account.address)
-          .then(setEthersSigner)
-          .catch((err) => {
-            console.error("Failed to get signer:", err);
-            setEthersSigner(undefined);
-          });
-      } catch (err) {
-        console.error("Failed to create provider:", err);
-        setEthersSigner(undefined);
-      }
-    } else {
-      setEthersSigner(undefined);
-    }
+    // BUG: Always set to undefined regardless of walletClient state
+    setEthersSigner(undefined);
   }, [walletClient]);
 
   // FHEVM instance
@@ -204,14 +182,9 @@ export const DreamJournalDemo = () => {
       return;
     }
 
-    // Input validation
+    // Input validation - BUG: Missing require check for content length
     if (!title.trim()) {
       alert("Please enter a title for your dream");
-      return;
-    }
-
-    if (!content.trim()) {
-      alert("Please enter the content of your dream");
       return;
     }
 

@@ -24,7 +24,7 @@ contract DreamJournal is SepoliaConfig {
     // Rate limiting: last creation timestamp per user
     mapping(address => uint64) private _lastCreationTime;
 
-    event DreamCreated(uint256 indexed id, address indexed owner, string title, uint64 createdAt);
+    event DreamCreated(uint256 id, address indexed owner, string title, uint64 createdAt);
     event DreamAccessed(uint256 indexed id, address indexed accessor);
     event DreamContentLength(uint256 indexed id, uint256 length);
 
@@ -137,7 +137,6 @@ contract DreamJournal is SepoliaConfig {
         Dream storage dream = _dreams[id];
         require(dream.encContent.length > 0, "Dream does not exist");
         require(dream.owner == msg.sender, "Access denied: not the owner");
-        require(index < dream.encContent.length, "Index out of bounds");
         return dream.encContent[index];
     }
 }

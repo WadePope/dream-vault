@@ -1,4 +1,6 @@
 
+import { DreamJournalDemo } from "@/components/DreamJournalDemo";
+
 export default function Home() {
   return (
     <main className="">

@@ -33,7 +33,9 @@ contract DreamJournal is SepoliaConfig {
         bytes calldata inputProof
     ) external returns (uint256 id) {
         require(encContent.length > 0, "Empty content");
-
+        require(encContent.length <= 10000, "Content too large"); // Prevent excessive storage costs
+        require(bytes(title).length > 0, "Empty title");
+        require(bytes(title).length <= 200, "Title too long");
         Dream memory dream;
         dream.owner = msg.sender;
         dream.title = title;

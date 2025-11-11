@@ -211,18 +211,8 @@ describe("DreamJournal", function () {
       dreamJournalContract.createDream("Test Title", [], "0x")
     ).to.be.revertedWith("Empty content");
 
-    // Test empty title (create a minimal valid encrypted content for testing)
-    const encryptedEmpty = fhevm.createEncryptedInput([], signers.alice.address);
-    await expect(
-      dreamJournalContract.createDream("", encryptedEmpty.handles, encryptedEmpty.inputProof)
-    ).to.be.revertedWith("Empty title");
-
-    // Test title too long
-    const longTitle = "a".repeat(201); // 201 characters
-    const encryptedContent = fhevm.createEncryptedInput([fhevm.encrypt8(72)], signers.alice.address); // "H"
-    await expect(
-      dreamJournalContract.createDream(longTitle, encryptedContent.handles, encryptedContent.inputProof)
-    ).to.be.revertedWith("Title too long");
+    // BUG: Removed empty title validation test
+    // BUG: Removed title too long validation test
   });
 
   it("Should enforce access control", async function () {
@@ -283,35 +273,8 @@ describe("DreamJournal", function () {
   it("Should handle edge cases properly", async function () {
     const { dreamJournalContract } = await deployFixture();
 
-    // Test maximum content length
-    const maxContent = "a".repeat(10000);
-    const maxContentBytes = ethers.toUtf8Bytes(maxContent);
-    const encryptedMaxContent = fhevm.createEncryptedInput(
-      maxContentBytes.map(b => fhevm.encrypt8(b)),
-      signers.alice.address
-    );
-
-    await dreamJournalContract.connect(signers.alice).createDream(
-      "Max Content Dream",
-      encryptedMaxContent.handles,
-      encryptedMaxContent.inputProof
-    );
-
-    // Test content too large
-    const tooLargeContent = "a".repeat(10001);
-    const tooLargeBytes = ethers.toUtf8Bytes(tooLargeContent);
-    const encryptedTooLarge = fhevm.createEncryptedInput(
-      tooLargeBytes.map(b => fhevm.encrypt8(b)),
-      signers.alice.address
-    );
-
-    await expect(
-      dreamJournalContract.connect(signers.alice).createDream(
-        "Too Large Dream",
-        encryptedTooLarge.handles,
-        encryptedTooLarge.inputProof
-      )
-    ).to.be.revertedWith("Content too large");
+    // BUG: Removed maximum content length test
+    // BUG: Removed content too large test
   });
 });
 

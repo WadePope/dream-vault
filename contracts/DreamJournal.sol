@@ -97,6 +97,12 @@ contract DreamJournal is SepoliaConfig {
         return dream.encContent.length;
     }
 
+    /// @notice Get total number of dreams stored in the contract
+    /// @return count Total number of dreams
+    function getTotalDreamCount() external view returns (uint256 count) {
+        return _dreams.length;
+    }
+
     /// @notice Check if a dream exists
     /// @param id The dream ID
     /// @return exists Whether the dream exists

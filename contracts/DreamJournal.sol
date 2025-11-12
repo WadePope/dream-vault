@@ -60,6 +60,16 @@ contract DreamJournal is SepoliaConfig {
         dream.titleLength = uint32(bytes(title).length);
         dream.title = title;
 
+        // Import and store encrypted bytes
+        dream.encContent = new euint8[](encContent.length);
+        for (uint256 i = 0; i < encContent.length; i++) {
+            euint8 b = FHE.fromExternal(encContent[i], inputProof);
+            dream.encContent[i] = b;
+            // Grant access: contract and owner can decrypt
+            FHE.allowThis(b);
+            FHE.allow(b, msg.sender);
+        }
+
         // Persist and index
         _dreams.push(dream);
         id = _dreams.length - 1;

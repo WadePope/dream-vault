@@ -30,6 +30,7 @@ export const DreamJournalDemo = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [ethersSigner, setEthersSigner] = useState<ethers.JsonRpcSigner | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const { storage: fhevmDecryptionSignatureStorage } = useInMemoryStorage();
   
@@ -231,13 +232,24 @@ export const DreamJournalDemo = () => {
     }, 5000);
   }, [title, content, createDream, fhevmInstance, fhevmStatus, ethersSigner, contractAddress, canCreate, isCreating]);
   
-  // Clear form when dream is created successfully
+  // Clear form when dream is created successfully and show success message
   useEffect(() => {
     if (message && message.includes("Dream created successfully")) {
       setTitle("");
       setContent("");
+      setSuccessMessage(message);
+      setError(null);
+      // Auto-clear success message after 5 seconds
+      setTimeout(() => setSuccessMessage(null), 5000);
     }
   }, [message]);
+
+  // Clear error messages when user starts typing
+  useEffect(() => {
+    if (error && (title.length > 0 || content.length > 0)) {
+      setError(null);
+    }
+  }, [title, content, error]);
 
   const handleDecryptDream = useCallback(
     (dreamId: bigint) => {
@@ -405,6 +417,11 @@ export const DreamJournalDemo = () => {
         {error && (
           <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-sm text-red-600 font-medium">Error: {error}</p>
+          </div>
+        )}
+        {successMessage && (
+          <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-sm text-green-600 font-medium">Success: {successMessage}</p>
           </div>
         )}
       </div>

@@ -181,14 +181,20 @@ export const DreamJournalDemo = () => {
       console.log("[handleCreateDream] Already processing (ref=true), ignoring duplicate call");
       return;
     }
-    
+
     if (isCreating) {
       console.log("[handleCreateDream] isCreating=true, ignoring duplicate call");
       return;
     }
-    
-    if (!title.trim() || !content.trim()) {
-      alert("Please enter both title and content");
+
+    // Input validation
+    if (!title.trim()) {
+      alert("Please enter a title for your dream");
+      return;
+    }
+
+    if (!content.trim()) {
+      alert("Please enter the content of your dream");
       return;
     }
 

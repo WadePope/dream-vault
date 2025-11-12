@@ -191,6 +191,16 @@ export const DreamJournalDemo = () => {
       alert("Please enter both title and content");
       return;
     }
+
+    if (title.trim().length > 200) {
+      alert("Title must be 200 characters or less");
+      return;
+    }
+
+    if (content.trim().length > 10000) {
+      alert("Dream content must be 10,000 characters or less");
+      return;
+    }
     
     // Check if FHEVM instance is ready before creating
     if (!fhevmInstance) {

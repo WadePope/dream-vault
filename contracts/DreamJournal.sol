@@ -27,6 +27,7 @@ contract DreamJournal is SepoliaConfig {
     event DreamCreated(uint256 id, address indexed owner, string title, uint64 createdAt);
     event DreamAccessed(uint256 indexed id, address indexed accessor);
     event DreamContentLength(uint256 indexed id, uint256 length);
+    event DreamDecrypted(uint256 indexed id, address indexed decryptor, uint64 timestamp);
 
     /// @notice Create a new dream entry with FHE encrypted content
     /// @param title Plaintext title for listing (not encrypted for discoverability)
@@ -124,6 +125,14 @@ contract DreamJournal is SepoliaConfig {
     function recordContentAccess(uint256 id) external {
         require(dreamExists(id), "Dream does not exist");
         emit DreamContentLength(id, getDreamContentLength(id));
+    }
+
+    /// @notice Record dream decryption for analytics
+    /// @param id The dream ID
+    function recordDecryption(uint256 id) external {
+        require(dreamExists(id), "Dream does not exist");
+        require(_dreams[id].owner == msg.sender, "Only owner can record decryption");
+        emit DreamDecrypted(id, msg.sender, uint64(block.timestamp));
     }
 
     /// @notice Get total number of dreams stored in the contract

@@ -675,6 +675,10 @@ export const useDreamJournal = (parameters: {
     ]
   );
 
+  const refreshDreams = useCallback(() => {
+    return loadDreams();
+  }, [loadDreams]);
+
   return {
     contractAddress: dreamJournal.address,
     dreams,
@@ -686,6 +690,7 @@ export const useDreamJournal = (parameters: {
     isDeployed,
     createDream,
     loadDreams,
+    refreshDreams,
     decryptDream,
   };
 };

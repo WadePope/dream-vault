@@ -410,7 +410,11 @@ export const DreamJournalDemo = () => {
               placeholder="e.g., Flying Dream"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               disabled={isCreating}
+              maxLength={200}
             />
+            <p className="mt-1 text-xs text-gray-500">
+              {title.length}/200 characters
+            </p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -423,10 +427,12 @@ export const DreamJournalDemo = () => {
               rows={5}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
               disabled={isCreating}
+              maxLength={10000}
             />
-            <p className="mt-1 text-xs text-gray-500">
-              Your dream content will be fully homomorphically encrypted locally before being stored on-chain.
-            </p>
+            <div className="mt-1 flex justify-between text-xs text-gray-500">
+              <span>Your dream content will be fully homomorphically encrypted locally before being stored on-chain.</span>
+              <span>{content.length}/10,000 characters</span>
+            </div>
           </div>
           <button
             onClick={handleCreateDream}

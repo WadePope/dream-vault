@@ -70,10 +70,32 @@ export const DreamJournalDemo = () => {
     return undefined;
   }, [chainId, walletClient]);
 
-  // Convert walletClient to ethers signer - BUG: Completely broken reconnection logic
+  // Convert walletClient to ethers signer
   useEffect(() => {
-    // BUG: Always set to undefined regardless of walletClient state
-    setEthersSigner(undefined);
+    if (walletClient) {
+      const { account, chain, transport } = walletClient;
+      const network = {
+        chainId: chain.id,
+        name: chain.name,
+        ensAddress: chain.contracts?.ensRegistry?.address,
+      };
+
+      try {
+        // Create provider from transport
+        const provider = new ethers.BrowserProvider(transport as any, network);
+        provider.getSigner(account.address)
+          .then(setEthersSigner)
+          .catch((err) => {
+            console.error("Failed to get signer:", err);
+            setEthersSigner(undefined);
+          });
+      } catch (err) {
+        console.error("Failed to create provider:", err);
+        setEthersSigner(undefined);
+      }
+    } else {
+      setEthersSigner(undefined);
+    }
   }, [walletClient]);
 
   // FHEVM instance

@@ -273,8 +273,30 @@ describe("DreamJournal", function () {
   it("Should handle edge cases properly", async function () {
     const { dreamJournalContract } = await deployFixture();
 
-    // BUG: Removed maximum content length test
-    // BUG: Removed content too large test
+    // Test rate limiting
+    const title = "Rate Limited Dream";
+    const content = "This dream tests rate limiting";
+    const contentBytes = ethers.toUtf8Bytes(content);
+    const encryptedContent = fhevm.createEncryptedInput(
+      contentBytes.map(b => fhevm.encrypt8(b)),
+      signers.alice.address
+    );
+
+    // Create first dream
+    await dreamJournalContract.connect(signers.alice).createDream(
+      title,
+      encryptedContent.handles,
+      encryptedContent.inputProof
+    );
+
+    // Try to create another dream immediately (should fail due to rate limit)
+    await expect(
+      dreamJournalContract.connect(signers.alice).createDream(
+        "Second Dream",
+        encryptedContent.handles,
+        encryptedContent.inputProof
+      )
+    ).to.be.revertedWith("Rate limit: one dream per hour allowed");
   });
 });
 

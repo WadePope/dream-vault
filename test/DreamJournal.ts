@@ -22,6 +22,7 @@ describe("DreamJournal", function () {
   let signers: Signers;
   let dreamJournalContract: DreamJournal;
   let dreamJournalContractAddress: string;
+  let fhevm: FhevmType;
 
   before(async function () {
     const ethSigners: HardhatEthersSigner[] = await ethers.getSigners();
@@ -200,6 +201,28 @@ describe("DreamJournal", function () {
 
     expect(aliceCount).to.eq(1n);
     expect(bobCount).to.eq(0n);
+  });
+
+  it("Should validate input constraints", async function () {
+    const { dreamJournalContract } = await deployFixture();
+
+    // Test empty content
+    await expect(
+      dreamJournalContract.createDream("Test Title", [], "0x")
+    ).to.be.revertedWith("Empty content");
+
+    // Test empty title (create a minimal valid encrypted content for testing)
+    const encryptedEmpty = fhevm.createEncryptedInput([], signers.alice.address);
+    await expect(
+      dreamJournalContract.createDream("", encryptedEmpty.handles, encryptedEmpty.inputProof)
+    ).to.be.revertedWith("Empty title");
+
+    // Test title too long
+    const longTitle = "a".repeat(201); // 201 characters
+    const encryptedContent = fhevm.createEncryptedInput([fhevm.encrypt8(72)], signers.alice.address); // "H"
+    await expect(
+      dreamJournalContract.createDream(longTitle, encryptedContent.handles, encryptedContent.inputProof)
+    ).to.be.revertedWith("Title too long");
   });
 });
 

@@ -24,7 +24,7 @@ contract DreamJournal is SepoliaConfig {
     // Rate limiting: last creation timestamp per user
     mapping(address => uint64) private _lastCreationTime;
 
-    event DreamCreated(uint256 id, address indexed owner, string title, uint64 createdAt);
+    event DreamCreated(uint256 indexed id, address indexed owner, string title, uint64 createdAt);
     event DreamAccessed(uint256 indexed id, address indexed accessor);
     event DreamContentLength(uint256 indexed id, uint256 length);
     event DreamDecrypted(uint256 indexed id, address indexed decryptor, uint64 timestamp);

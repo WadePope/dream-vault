@@ -19,7 +19,9 @@ const INFURA_API_KEY: string = vars.get("INFURA_API_KEY", "b18fb7e6ca7045ac83c41
 const PRIVATE_KEY: string = vars.get("PRIVATE_KEY", "5e8e4a4a1284f85d996a4a5d124495a896aaef6a69f4c81026316c8226d67c9d");
 
 const config: HardhatUserConfig = {
+  // Use Hardhat network for local development and testing
   defaultNetwork: "hardhat",
+  // Named accounts for easier contract deployment
   namedAccounts: {
     deployer: 0,
   },

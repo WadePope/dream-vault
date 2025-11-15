@@ -384,6 +384,12 @@ export const DreamJournalDemo = () => {
               <span>Contract: {contractAddress.slice(0, 6)}...{contractAddress.slice(-4)}</span>
             </>
           )}
+          {dreams.length > 0 && (
+            <>
+              <span>•</span>
+              <span>Total Dreams: {dreams.length}</span>
+            </>
+          )}
           {message && (
             <>
               <span>•</span>

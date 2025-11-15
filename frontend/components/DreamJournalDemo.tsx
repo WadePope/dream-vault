@@ -210,7 +210,7 @@ export const DreamJournalDemo = () => {
     
     // Check if FHEVM instance is ready before creating
     if (!fhevmInstance) {
-      alert("Zama FHEVM instance is not ready. Please wait a moment and try again.\n\nIf this persists, check:\n1. Wallet is connected\n2. Network is Hardhat Local (Chain ID: 31337)\n3. Hardhat node is running\n4. FHEVM libraries are properly loaded");
+      alert("Zama FHEVM instance is not ready. Please wait a moment and try again.\n\nIf this persists, check:\n1. Wallet is connected\n2. Network is Hardhat Local (Chain ID: 31337) or Sepolia (Chain ID: 11155111)\n3. Hardhat node is running (for local development)\n4. FHEVM libraries are properly loaded");
       return;
     }
     

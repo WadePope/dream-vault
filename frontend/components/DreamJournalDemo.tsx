@@ -18,6 +18,7 @@ export const DreamJournalDemo = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [showDecrypted, setShowDecrypted] = useState<Record<string, boolean>>({});
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [ethersSigner, setEthersSigner] = useState<ethers.JsonRpcSigner | undefined>(undefined);
 
   const { storage: fhevmDecryptionSignatureStorage } = useInMemoryStorage();
@@ -457,11 +458,14 @@ export const DreamJournalDemo = () => {
             My Encrypted Dream Entries ({dreams.length})
           </h3>
           <button
-            onClick={loadDreams}
-            disabled={!canLoadDreams || isLoading}
+            onClick={() => {
+              setIsRefreshing(true);
+              loadDreams().finally(() => setIsRefreshing(false));
+            }}
+            disabled={!canLoadDreams || isLoading || isRefreshing}
             className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? "Loading..." : "Refresh"}
+            {isLoading || isRefreshing ? "Loading..." : "Refresh"}
           </button>
         </div>
 

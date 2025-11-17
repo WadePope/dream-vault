@@ -273,6 +273,27 @@ export const DreamJournalDemo = () => {
     }
   }, [title, content, error]);
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl/Cmd + Enter to submit dream
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && canCreate && isValidInput && !isCreating) {
+        e.preventDefault();
+        handleCreateDream();
+      }
+      // Escape to clear form
+      if (e.key === 'Escape' && !isCreating) {
+        setTitle("");
+        setContent("");
+        setError(null);
+        setSuccessMessage(null);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [canCreate, isValidInput, isCreating, handleCreateDream]);
+
   const handleDecryptDream = useCallback(
     (dreamId: bigint) => {
       const dream = dreams.find((d) => d.id === dreamId);
@@ -511,9 +532,16 @@ export const DreamJournalDemo = () => {
               loadDreams().finally(() => setIsRefreshing(false));
             }}
             disabled={!canLoadDreams || isLoading || isRefreshing}
-            className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            {isLoading || isRefreshing ? "Loading..." : "Refresh"}
+            {isLoading || isRefreshing ? (
+              <>
+                <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+                Loading...
+              </>
+            ) : (
+              "Refresh"
+            )}
           </button>
         </div>
 

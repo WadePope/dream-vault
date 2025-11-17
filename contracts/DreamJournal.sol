@@ -156,6 +156,8 @@ contract DreamJournal is SepoliaConfig {
         Dream storage dream = _dreams[id];
         require(dream.encContent.length > 0, "Dream does not exist");
         require(dream.owner == msg.sender, "Access denied: not the owner");
+        require(index >= 0, "Index cannot be negative");
+        require(index < dream.encContent.length, "Index out of bounds");
         return dream.encContent[index];
     }
 }

@@ -205,9 +205,14 @@ export const DreamJournalDemo = () => {
       return;
     }
 
-    // Input validation - BUG: Missing require check for content length
+    // Input validation
     if (!title.trim()) {
       alert("Please enter a title for your dream");
+      return;
+    }
+
+    if (!content.trim()) {
+      alert("Please enter the content of your dream");
       return;
     }
 

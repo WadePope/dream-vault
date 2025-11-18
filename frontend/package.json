@@ -1,5 +1,6 @@
 {
   "name": "dream-journal-frontend",
+  "description": "Frontend for Encrypted Dream Journal using FHEVM",
   "version": "0.1.0",
   "private": true,
   "license": "BSD-3-Clause-Clear",

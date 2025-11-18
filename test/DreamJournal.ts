@@ -273,30 +273,35 @@ describe("DreamJournal", function () {
   it("Should handle edge cases properly", async function () {
     const { dreamJournalContract } = await deployFixture();
 
-    // Test rate limiting
-    const title = "Rate Limited Dream";
-    const content = "This dream tests rate limiting";
-    const contentBytes = ethers.toUtf8Bytes(content);
-    const encryptedContent = fhevm.createEncryptedInput(
-      contentBytes.map(b => fhevm.encrypt8(b)),
+    // Test maximum content length
+    const maxContent = "a".repeat(10000);
+    const maxContentBytes = ethers.toUtf8Bytes(maxContent);
+    const encryptedMaxContent = fhevm.createEncryptedInput(
+      maxContentBytes.map(b => fhevm.encrypt8(b)),
       signers.alice.address
     );
 
-    // Create first dream
     await dreamJournalContract.connect(signers.alice).createDream(
-      title,
-      encryptedContent.handles,
-      encryptedContent.inputProof
+      "Max Content Dream",
+      encryptedMaxContent.handles,
+      encryptedMaxContent.inputProof
     );
 
-    // Try to create another dream immediately (should fail due to rate limit)
+    // Test content too large
+    const tooLargeContent = "a".repeat(10001);
+    const tooLargeBytes = ethers.toUtf8Bytes(tooLargeContent);
+    const encryptedTooLarge = fhevm.createEncryptedInput(
+      tooLargeBytes.map(b => fhevm.encrypt8(b)),
+      signers.alice.address
+    );
+
     await expect(
       dreamJournalContract.connect(signers.alice).createDream(
-        "Second Dream",
-        encryptedContent.handles,
-        encryptedContent.inputProof
+        "Too Large Dream",
+        encryptedTooLarge.handles,
+        encryptedTooLarge.inputProof
       )
-    ).to.be.revertedWith("Rate limit: one dream per hour allowed");
+    ).to.be.revertedWith("Content too large");
   });
 });
 

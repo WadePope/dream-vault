@@ -24,6 +24,13 @@ const config: HardhatUserConfig = {
   // Named accounts for easier contract deployment
   namedAccounts: {
     deployer: 0,
+    alice: 1,
+    bob: 2,
+  },
+  // Gas settings for better deployment reliability
+  gasReporter: {
+    enabled: process.env.REPORT_GAS !== undefined,
+    currency: "USD",
   },
   etherscan: {
     apiKey: {
@@ -45,6 +52,9 @@ const config: HardhatUserConfig = {
         mnemonic: MNEMONIC,
       },
       chainId: 31337,
+      // Configure gas limits for FHE operations
+      gas: 8000000,
+      gasPrice: 1000000000, // 1 gwei
     },
     anvil: {
       accounts: {

@@ -18,7 +18,8 @@ A privacy-preserving dream journal application that uses Fully Homomorphic Encry
 
 ## 🎥 Demo Video & Deployment
 
-- **📹 Demo Video**: [Download private.mp4](./private.mp4) - Watch the full demonstration of the encrypted dream journal system
+- **📹 Demo Video**: [Download demo-showcase.mp4](./demo-showcase.mp4) - Complete walkthrough of FHE dream encryption and decryption
+- **🎬 Feature Highlights**: [View private.mp4](./private.mp4) - Technical demonstration of FHEVM operations
 - **🚀 Live Deployment**: [https://privateself.vercel.app/](https://privateself.vercel.app/) - Try the live application
 
 ## Project Structure

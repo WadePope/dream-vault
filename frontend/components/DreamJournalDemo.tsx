@@ -110,30 +110,7 @@ export const DreamJournalDemo = () => {
     enabled: isConnected && !!eip1193Provider,
   });
 
-  // Debug: Log provider info and FHEVM status (only when status changes significantly)
-  const lastDebugRef = useRef<string>("");
-  useEffect(() => {
-    if (isConnected) {
-      const debugKey = `${chainId}-${fhevmStatus}-${!!eip1193Provider}-${!!ethersSigner}`;
-      // Only log when something significant changes
-      if (debugKey !== lastDebugRef.current) {
-        lastDebugRef.current = debugKey;
-        console.log("Provider Debug:", {
-          chainId,
-          hasEip1193Provider: !!eip1193Provider,
-          providerType: typeof eip1193Provider,
-          hasWalletClient: !!walletClient,
-          hasEthersSigner: !!ethersSigner,
-          hasEthersProvider: !!ethersProvider,
-          fhevmStatus,
-          fhevmError: fhevmError ? {
-            name: fhevmError.name,
-            message: fhevmError.message,
-          } : null,
-        });
-      }
-    }
-  }, [isConnected, chainId, eip1193Provider, walletClient, ethersSigner, ethersProvider, fhevmStatus, fhevmError]);
+  // Clean up debug logging for production
 
   // Same chain/signer refs
   const sameChainRef = useRef((id: number | undefined) => id === chainId);
@@ -384,8 +361,7 @@ export const DreamJournalDemo = () => {
     );
   }
 
-  // Check if on supported network (Hardhat Local or Sepolia)
-  const isCorrectNetwork = chainId === 31337 || chainId === 11155111; // Hardhat local or Sepolia
+  // Network validation is handled above in isCorrectNetwork memo
   
   if (!isCorrectNetwork && chainId !== undefined) {
     return (

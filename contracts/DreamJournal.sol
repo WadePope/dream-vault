@@ -92,11 +92,17 @@ contract DreamJournal is SepoliaConfig {
     /// @notice Get the length of FHE encrypted content for a dream
     /// @param id The dream ID
     /// @return length Number of FHE encrypted bytes (characters)
-    function getDreamContentLength(uint256 id) external returns (uint256 length) {
+    function getDreamContentLength(uint256 id) external view returns (uint256 length) {
         Dream storage dream = _dreams[id];
         require(dream.encContent.length > 0, "Dream does not exist");
-        length = dream.encContent.length;
-        emit DreamContentLength(id, length);
+        return dream.encContent.length;
+    }
+
+    /// @notice Record content length access for analytics
+    /// @param id The dream ID
+    function recordContentAccess(uint256 id) external {
+        require(dreamExists(id), "Dream does not exist");
+        emit DreamContentLength(id, getDreamContentLength(id));
     }
 
     /// @notice Get total number of dreams stored in the contract

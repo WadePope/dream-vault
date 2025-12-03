@@ -124,6 +124,8 @@ contract DreamJournal is SepoliaConfig {
     /// @return encByte The FHE encrypted byte as euint8
     function getDreamContentByte(uint256 id, uint256 index) external view returns (euint8 encByte) {
         Dream storage dream = _dreams[id];
+        require(dream.encContent.length > 0, "Dream does not exist");
+        require(dream.owner == msg.sender, "Access denied: not the owner");
         require(index < dream.encContent.length, "Index out of bounds");
         return dream.encContent[index];
     }

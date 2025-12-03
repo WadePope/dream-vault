@@ -10,10 +10,11 @@ import {SepoliaConfig} from "@fhevm/solidity/config/ZamaConfig.sol";
 /// @dev This contract uses Zama's FHEVM for fully homomorphic encryption
 contract DreamJournal is SepoliaConfig {
     struct Dream {
-        address owner;
-        string title; // Plaintext title for listing purposes
-        euint8[] encContent; // FHE-encrypted dream content (one byte per character)
-        uint64 createdAt; // Unix timestamp
+        address owner;      // 20 bytes - slot 0
+        uint64 createdAt;   // 8 bytes - packed with next field
+        uint32 titleLength; // 4 bytes - packed with createdAt
+        string title;       // dynamic - separate slot
+        euint8[] encContent; // dynamic - separate slot
     }
 
     Dream[] private _dreams;
@@ -37,10 +38,12 @@ contract DreamJournal is SepoliaConfig {
         require(encContent.length <= 10000, "Content too large"); // Prevent excessive storage costs
         require(bytes(title).length > 0, "Empty title");
         require(bytes(title).length <= 200, "Title too long");
+
         Dream memory dream;
         dream.owner = msg.sender;
-        dream.title = title;
         dream.createdAt = uint64(block.timestamp);
+        dream.titleLength = uint32(bytes(title).length);
+        dream.title = title;
 
         // Import and store encrypted bytes
         dream.encContent = new euint8[](encContent.length);

@@ -19,6 +19,8 @@ contract DreamJournal is SepoliaConfig {
 
     Dream[] private _dreams;
     mapping(address => uint256[]) private _dreamsOf;
+    // Track content hashes to prevent duplicates (length + owner combination)
+    mapping(bytes32 => bool) private _contentHashes;
 
     event DreamCreated(uint256 indexed id, address indexed owner, string title, uint64 createdAt);
     event DreamAccessed(uint256 indexed id, address indexed accessor);
@@ -38,6 +40,11 @@ contract DreamJournal is SepoliaConfig {
         require(encContent.length <= 10000, "Content too large"); // Prevent excessive storage costs
         require(bytes(title).length > 0, "Empty title");
         require(bytes(title).length <= 200, "Title too long");
+
+        // Prevent duplicate dreams (same content length from same owner)
+        bytes32 contentHash = keccak256(abi.encodePacked(msg.sender, encContent.length, title));
+        require(!_contentHashes[contentHash], "Duplicate dream content detected");
+        _contentHashes[contentHash] = true;
 
         Dream memory dream;
         dream.owner = msg.sender;

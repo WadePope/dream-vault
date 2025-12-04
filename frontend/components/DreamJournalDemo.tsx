@@ -20,6 +20,7 @@ export const DreamJournalDemo = () => {
   const [showDecrypted, setShowDecrypted] = useState<Record<string, boolean>>({});
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [ethersSigner, setEthersSigner] = useState<ethers.JsonRpcSigner | undefined>(undefined);
+  const [error, setError] = useState<string | null>(null);
 
   const { storage: fhevmDecryptionSignatureStorage } = useInMemoryStorage();
   
@@ -222,9 +223,9 @@ export const DreamJournalDemo = () => {
     }
     
     handleCreateDreamRef.current = true;
-    console.log("[handleCreateDream] Creating dream with:", { 
-      title: title.trim(), 
-      contentLength: content.trim().length, 
+    console.log("[handleCreateDream] Creating dream with:", {
+      title: title.trim(),
+      contentLength: content.trim().length,
       hasInstance: !!fhevmInstance,
       fhevmStatus,
       hasSigner: !!ethersSigner,
@@ -232,9 +233,15 @@ export const DreamJournalDemo = () => {
       canCreate,
       isCreating,
     });
-    
-    // Call createDream
-    createDream(title.trim(), content.trim());
+
+    try {
+      setError(null);
+      // Call createDream
+      createDream(title.trim(), content.trim());
+    } catch (err) {
+      console.error("[handleCreateDream] Error creating dream:", err);
+      setError(err instanceof Error ? err.message : "Failed to create dream");
+    }
     
     // Reset the ref after a delay to allow retry if needed
     setTimeout(() => {
@@ -413,6 +420,11 @@ export const DreamJournalDemo = () => {
             </>
           )}
         </div>
+        {error && (
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-600 font-medium">Error: {error}</p>
+          </div>
+        )}
       </div>
 
       {/* Create Dream Form */}

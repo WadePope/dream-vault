@@ -24,6 +24,12 @@ export const DreamJournalDemo = () => {
   const { storage: fhevmDecryptionSignatureStorage } = useInMemoryStorage();
   
   const ethersProvider = useEthersProvider({ chainId });
+
+  // Memoize network check to avoid recalculation
+  const isCorrectNetwork = useMemo(() =>
+    chainId === 31337 || chainId === 11155111,
+    [chainId]
+  );
   
   // Get EIP1193 provider - for local Hardhat, use RPC URL string directly
   // For other networks, use walletClient transport or window.ethereum
@@ -265,6 +271,15 @@ export const DreamJournalDemo = () => {
     [dreams, decryptDream]
   );
 
+  // Memoize validation checks
+  const isValidInput = useMemo(() =>
+    title.trim().length > 0 &&
+    title.trim().length <= 200 &&
+    content.trim().length > 0 &&
+    content.trim().length <= 10000,
+    [title, content]
+  );
+
   if (!isConnected) {
     return (
       <div className="mx-auto w-full max-w-2xl">
@@ -443,7 +458,7 @@ export const DreamJournalDemo = () => {
           </div>
           <button
             onClick={handleCreateDream}
-            disabled={!canCreate || !title.trim() || !content.trim()}
+            disabled={!canCreate || !isValidInput}
             className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isCreating ? "Homomorphically Encrypting..." : "FHE Encrypt & Create Dream"}

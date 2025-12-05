@@ -1,6 +1,15 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+
+// Input sanitization utility
+const sanitizeInput = (input: string): string => {
+  return input
+    .replace(/[<>]/g, '') // Remove potential HTML tags
+    .replace(/javascript:/gi, '') // Remove javascript: protocol
+    .replace(/on\w+=/gi, '') // Remove event handlers
+    .trim();
+};
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount, useChainId, useWalletClient } from "wagmi";
 import { ethers } from "ethers";
@@ -440,7 +449,7 @@ export const DreamJournalDemo = () => {
             <input
               type="text"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => setTitle(sanitizeInput(e.target.value))}
               placeholder="e.g., Flying Dream"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               disabled={isCreating}
@@ -456,7 +465,7 @@ export const DreamJournalDemo = () => {
             </label>
             <textarea
               value={content}
-              onChange={(e) => setContent(e.target.value)}
+              onChange={(e) => setContent(sanitizeInput(e.target.value))}
               placeholder="Describe your dream... (will be FHE encrypted before storage)"
               rows={5}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"

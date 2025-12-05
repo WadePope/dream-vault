@@ -34,6 +34,10 @@ const config: HardhatUserConfig = {
     currency: "USD",
     enabled: process.env.REPORT_GAS ? true : false,
     excludeContracts: [],
+    outputFile: "gas-report.txt",
+    noColors: true,
+    showMethodSig: true,
+    showTimeSpent: true,
   },
   networks: {
     hardhat: {
@@ -75,13 +79,19 @@ const config: HardhatUserConfig = {
         // https://github.com/paulrberg/hardhat-template/issues/31
         bytecodeHash: "none",
       },
-      // Disable the optimizer when debugging
-      // https://hardhat.org/hardhat-network/#solidity-optimizer-support
+      // Optimize for deployment cost and execution cost balance
       optimizer: {
         enabled: true,
-        runs: 800,
+        runs: 1000, // Increased for better execution optimization
+        details: {
+          yul: true, // Enable Yul optimizer
+          yulDetails: {
+            stackAllocation: true,
+          },
+        },
       },
       evmVersion: "cancun",
+      viaIR: false, // Use legacy pipeline for better FHE compatibility
     },
   },
   typechain: {

@@ -224,5 +224,94 @@ describe("DreamJournal", function () {
       dreamJournalContract.createDream(longTitle, encryptedContent.handles, encryptedContent.inputProof)
     ).to.be.revertedWith("Title too long");
   });
+
+  it("Should enforce access control", async function () {
+    const { dreamJournalContract } = await deployFixture();
+
+    // First create a dream with Alice
+    const title = "Alice's Dream";
+    const content = "Secret dream content";
+    const contentBytes = ethers.toUtf8Bytes(content);
+    const encryptedContent = fhevm.createEncryptedInput(
+      contentBytes.map(b => fhevm.encrypt8(b)),
+      signers.alice.address
+    );
+
+    await dreamJournalContract.connect(signers.alice).createDream(
+      title,
+      encryptedContent.handles,
+      encryptedContent.inputProof
+    );
+
+    const dreamIds = await dreamJournalContract.getDreamIds(signers.alice.address);
+    const dreamId = dreamIds[0];
+
+    // Bob should not be able to access Alice's encrypted content
+    await expect(
+      dreamJournalContract.connect(signers.bob).getDreamContentByte(dreamId, 0n)
+    ).to.be.revertedWith("Access denied: not the owner");
+  });
+
+  it("Should prevent duplicate dreams", async function () {
+    const { dreamJournalContract } = await deployFixture();
+
+    const title = "Duplicate Dream";
+    const content = "This dream will be duplicated";
+    const contentBytes = ethers.toUtf8Bytes(content);
+    const encryptedContent = fhevm.createEncryptedInput(
+      contentBytes.map(b => fhevm.encrypt8(b)),
+      signers.alice.address
+    );
+
+    // Create first dream
+    await dreamJournalContract.connect(signers.alice).createDream(
+      title,
+      encryptedContent.handles,
+      encryptedContent.inputProof
+    );
+
+    // Try to create the same dream again (same title, content length, and owner)
+    await expect(
+      dreamJournalContract.connect(signers.alice).createDream(
+        title,
+        encryptedContent.handles,
+        encryptedContent.inputProof
+      )
+    ).to.be.revertedWith("Duplicate dream content detected");
+  });
+
+  it("Should handle edge cases properly", async function () {
+    const { dreamJournalContract } = await deployFixture();
+
+    // Test maximum content length
+    const maxContent = "a".repeat(10000);
+    const maxContentBytes = ethers.toUtf8Bytes(maxContent);
+    const encryptedMaxContent = fhevm.createEncryptedInput(
+      maxContentBytes.map(b => fhevm.encrypt8(b)),
+      signers.alice.address
+    );
+
+    await dreamJournalContract.connect(signers.alice).createDream(
+      "Max Content Dream",
+      encryptedMaxContent.handles,
+      encryptedMaxContent.inputProof
+    );
+
+    // Test content too large
+    const tooLargeContent = "a".repeat(10001);
+    const tooLargeBytes = ethers.toUtf8Bytes(tooLargeContent);
+    const encryptedTooLarge = fhevm.createEncryptedInput(
+      tooLargeBytes.map(b => fhevm.encrypt8(b)),
+      signers.alice.address
+    );
+
+    await expect(
+      dreamJournalContract.connect(signers.alice).createDream(
+        "Too Large Dream",
+        encryptedTooLarge.handles,
+        encryptedTooLarge.inputProof
+      )
+    ).to.be.revertedWith("Content too large");
+  });
 });
 

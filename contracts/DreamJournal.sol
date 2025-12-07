@@ -21,6 +21,8 @@ contract DreamJournal is SepoliaConfig {
     mapping(address => uint256[]) private _dreamsOf;
     // Track content hashes to prevent duplicates (length + owner combination)
     mapping(bytes32 => bool) private _contentHashes;
+    // Rate limiting: last creation timestamp per user
+    mapping(address => uint64) private _lastCreationTime;
 
     event DreamCreated(uint256 indexed id, address indexed owner, string title, uint64 createdAt);
     event DreamAccessed(uint256 indexed id, address indexed accessor);
@@ -40,6 +42,12 @@ contract DreamJournal is SepoliaConfig {
         require(encContent.length <= 10000, "Content too large"); // Prevent excessive storage costs
         require(bytes(title).length > 0, "Empty title");
         require(bytes(title).length <= 200, "Title too long");
+
+        // Rate limiting: one dream per hour per user
+        require(
+            _lastCreationTime[msg.sender] == 0 || block.timestamp >= _lastCreationTime[msg.sender] + 1 hours,
+            "Rate limit: one dream per hour allowed"
+        );
 
         // Prevent duplicate dreams (same content length from same owner)
         bytes32 contentHash = keccak256(abi.encodePacked(msg.sender, encContent.length, title));
@@ -66,6 +74,9 @@ contract DreamJournal is SepoliaConfig {
         _dreams.push(dream);
         id = _dreams.length - 1;
         _dreamsOf[msg.sender].push(id);
+
+        // Update rate limiting timestamp
+        _lastCreationTime[msg.sender] = uint64(block.timestamp);
 
         emit DreamCreated(id, msg.sender, title, dream.createdAt);
     }
